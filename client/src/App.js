@@ -1,12 +1,13 @@
-import './App.css';
+import React from 'react';
+import AppRoutes from './routes'; // Ensure this imports the correct component
+import './styles/tailwind.css';
 
-function App() {
+const App = () => {
   return (
-    <div className="bg-black text-white p-4 flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold">Hello, TailwindCSS!</h1>
-      <p className="text-2xl mt-2">This is TailwindCSS in action.</p>
+    <div>
+      <AppRoutes /> {/* Ensure this uses the Routes component */}
     </div>
   );
-}
+};
 
 export default App;

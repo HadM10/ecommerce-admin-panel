@@ -1,7 +1,6 @@
 const express = require('express');
-const adminLogController = require('../controllers/adminLogController');
-
 const router = express.Router();
+const adminLogController = require('../controllers/adminLogController');
 
 router.get('/', adminLogController.getAllAdminLogs);
 router.get('/:id', adminLogController.getAdminLogById);

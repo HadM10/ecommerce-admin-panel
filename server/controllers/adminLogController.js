@@ -24,8 +24,8 @@ exports.getAdminLogById = async (req, res) => {
 
 exports.createAdminLog = async (req, res) => {
   try {
-    const { admin_id, action } = req.body;
-    const newAdminLog = await AdminLog.create({ admin_id, action });
+    const { adminId, action } = req.body;
+    const newAdminLog = await AdminLog.create({ adminId, action });
     res.status(201).json(newAdminLog);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create admin log' });
@@ -34,8 +34,8 @@ exports.createAdminLog = async (req, res) => {
 
 exports.updateAdminLog = async (req, res) => {
   try {
-    const { admin_id, action } = req.body;
-    const [updated] = await AdminLog.update({ admin_id, action }, {
+    const { adminId, action } = req.body;
+    const [updated] = await AdminLog.update({ adminId, action }, {
       where: { id: req.params.id }
     });
     if (updated) {
