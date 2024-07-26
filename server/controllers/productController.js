@@ -1,78 +1,107 @@
 const Product = require('../models/Product');
 
-// Create a new product
-const createProduct = async (req, res) => {
-  try {
-    const { name, description, price, stock, category_id } = req.body;
-    const product = await Product.create({ name, description, price, stock, category_id });
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating product', error });
-  }
-};
-
 // Get all products
-const getProducts = async (req, res) => {
+exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.findAll();
+    const products = await Product.findAll({
+      include: [{ model: Category }],
+    });
     res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching products', error });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Get a product by ID
-const getProductById = async (req, res) => {
+// Get a single product by ID
+exports.getProductById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const product = await Product.findByPk(id);
-    if (product) {
-      res.status(200).json(product);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
+    const product = await Product.findByPk(req.params.id, {
+      include: [{ model: Category }],
+    });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
     }
+    res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching product', error });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Update a product
-const updateProduct = async (req, res) => {
+// Create a new product
+exports.createProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, description, price, stock, category_id } = req.body;
-    const product = await Product.findByPk(id);
-    if (product) {
-      await product.update({ name, description, price, stock, category_id });
-      res.status(200).json(product);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
+    const {
+      name,
+      description,
+      price,
+      stockQuantity,
+      imageUrl,
+      status,
+      sku,
+      categoryId,
+    } = req.body;
+    const newProduct = await Product.create({
+      name,
+      description,
+      price,
+      stockQuantity,
+      imageUrl,
+      status,
+      sku,
+      categoryId,
+    });
+    res.status(201).json(newProduct);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating product', error });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Delete a product
-const deleteProduct = async (req, res) => {
+// Update a product by ID
+exports.updateProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-    const product = await Product.findByPk(id);
-    if (product) {
-      await product.destroy();
-      res.status(200).json({ message: 'Product deleted successfully' });
-    } else {
-      res.status(404).json({ message: 'Product not found' });
+    const {
+      name,
+      description,
+      price,
+      stockQuantity,
+      imageUrl,
+      status,
+      sku,
+      categoryId,
+    } = req.body;
+    const product = await Product.findByPk(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
     }
+
+    await product.update({
+      name,
+      description,
+      price,
+      stockQuantity,
+      imageUrl,
+      status,
+      sku,
+      categoryId,
+    });
+
+    res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting product', error });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-module.exports = {
-  createProduct,
-  getProducts,
-  getProductById,
-  updateProduct,
-  deleteProduct
+// Delete a product by ID
+exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    await product.destroy();
+    res.status(204).json();
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
 };

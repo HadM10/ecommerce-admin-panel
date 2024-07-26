@@ -23,6 +23,18 @@ const Order = sequelize.define('Order', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  trackingNumber: {
+    type: DataTypes.STRING,
+    allowNull: true, // Optional if you're not using tracking numbers
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 });
 
 User.hasMany(Order, { foreignKey: 'userId' });

@@ -1,65 +1,57 @@
-const OrderItem = require('../models/OrderItem');
+const { OrderItem } = require('../models/OrderItem');
 
-exports.getAllOrderItems = async (req, res) => {
+// Fetch all order items or a single order item by ID
+exports.getOrderItems = async (req, res) => {
   try {
-    const orderItems = await OrderItem.findAll();
-    res.json(orderItems);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch order items' });
-  }
-};
-
-exports.getOrderItemById = async (req, res) => {
-  try {
-    const orderItem = await OrderItem.findByPk(req.params.id);
-    if (orderItem) {
-      res.json(orderItem);
+    const orderItems = req.params.orderItemId
+      ? await OrderItem.findByPk(req.params.orderItemId)
+      : await OrderItem.findAll();
+    if (orderItems) {
+      res.json(orderItems);
     } else {
-      res.status(404).json({ error: 'Order item not found' });
+      res.status(404).json({ message: 'No order items found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch order item' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
+// Create a new order item
 exports.createOrderItem = async (req, res) => {
   try {
-    const { order_id, product_id, quantity } = req.body;
-    const newOrderItem = await OrderItem.create({ order_id, product_id, quantity });
-    res.status(201).json(newOrderItem);
+    const orderItem = await OrderItem.create(req.body);
+    res.status(201).json(orderItem);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create order item' });
+    res.status(400).json({ message: 'Failed to create order item', error });
   }
 };
 
+// Update an existing order item
 exports.updateOrderItem = async (req, res) => {
   try {
-    const { order_id, product_id, quantity } = req.body;
-    const [updated] = await OrderItem.update({ order_id, product_id, quantity }, {
-      where: { id: req.params.id }
-    });
-    if (updated) {
-      const updatedOrderItem = await OrderItem.findByPk(req.params.id);
-      res.json(updatedOrderItem);
+    const orderItem = await OrderItem.findByPk(req.params.orderItemId);
+    if (orderItem) {
+      await orderItem.update(req.body);
+      res.json(orderItem);
     } else {
-      res.status(404).json({ error: 'Order item not found' });
+      res.status(404).json({ message: 'Order item not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update order item' });
+    res.status(400).json({ message: 'Failed to update order item', error });
   }
 };
 
+// Delete an order item
 exports.deleteOrderItem = async (req, res) => {
   try {
-    const deleted = await OrderItem.destroy({
-      where: { id: req.params.id }
-    });
-    if (deleted) {
-      res.status(204).json({ message: 'Order item deleted' });
+    const orderItem = await OrderItem.findByPk(req.params.orderItemId);
+    if (orderItem) {
+      await orderItem.destroy();
+      res.json({ message: 'Order item deleted successfully' });
     } else {
-      res.status(404).json({ error: 'Order item not found' });
+      res.status(404).json({ message: 'Order item not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete order item' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };

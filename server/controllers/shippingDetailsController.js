@@ -1,65 +1,57 @@
-const ShippingDetails = require('../models/ShippingDetails');
+const { ShippingDetail } = require('../models/ShippingDetails');
 
-exports.getAllShippingDetails = async (req, res) => {
+// Fetch all shipping details or a single shipping detail by ID
+exports.getShippingDetails = async (req, res) => {
   try {
-    const shippingDetails = await ShippingDetails.findAll();
-    res.json(shippingDetails);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch shipping details' });
-  }
-};
-
-exports.getShippingDetailsById = async (req, res) => {
-  try {
-    const shippingDetails = await ShippingDetails.findByPk(req.params.id);
-    if (shippingDetails) {
-      res.json(shippingDetails);
+    const details = req.params.shippingDetailId
+      ? await ShippingDetail.findByPk(req.params.shippingDetailId)
+      : await ShippingDetail.findAll();
+    if (details) {
+      res.json(details);
     } else {
-      res.status(404).json({ error: 'Shipping details not found' });
+      res.status(404).json({ message: 'No shipping details found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch shipping details' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.createShippingDetails = async (req, res) => {
+// Create new shipping detail
+exports.createShippingDetail = async (req, res) => {
   try {
-    const { order_id, address, city, state, postal_code, country } = req.body;
-    const newShippingDetails = await ShippingDetails.create({ order_id, address, city, state, postal_code, country });
-    res.status(201).json(newShippingDetails);
+    const detail = await ShippingDetail.create(req.body);
+    res.status(201).json(detail);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create shipping details' });
+    res.status(400).json({ message: 'Failed to create shipping detail', error });
   }
 };
 
-exports.updateShippingDetails = async (req, res) => {
+// Update existing shipping detail
+exports.updateShippingDetail = async (req, res) => {
   try {
-    const { order_id, address, city, state, postal_code, country } = req.body;
-    const [updated] = await ShippingDetails.update({ order_id, address, city, state, postal_code, country }, {
-      where: { id: req.params.id }
-    });
-    if (updated) {
-      const updatedShippingDetails = await ShippingDetails.findByPk(req.params.id);
-      res.json(updatedShippingDetails);
+    const detail = await ShippingDetail.findByPk(req.params.shippingDetailId);
+    if (detail) {
+      await detail.update(req.body);
+      res.json(detail);
     } else {
-      res.status(404).json({ error: 'Shipping details not found' });
+      res.status(404).json({ message: 'Shipping detail not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update shipping details' });
+    res.status(400).json({ message: 'Failed to update shipping detail', error });
   }
 };
 
-exports.deleteShippingDetails = async (req, res) => {
+// Delete a shipping detail
+exports.deleteShippingDetail = async (req, res) => {
   try {
-    const deleted = await ShippingDetails.destroy({
-      where: { id: req.params.id }
-    });
-    if (deleted) {
-      res.status(204).json({ message: 'Shipping details deleted' });
+    const detail = await ShippingDetail.findByPk(req.params.shippingDetailId);
+    if (detail) {
+      await detail.destroy();
+      res.json({ message: 'Shipping detail deleted successfully' });
     } else {
-      res.status(404).json({ error: 'Shipping details not found' });
+      res.status(404).json({ message: 'Shipping detail not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete shipping details' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };

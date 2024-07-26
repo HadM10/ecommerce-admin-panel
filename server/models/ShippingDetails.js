@@ -41,6 +41,11 @@ const ShippingDetail = sequelize.define('ShippingDetail', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 });
+
 
 module.exports = ShippingDetail;

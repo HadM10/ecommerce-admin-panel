@@ -1,12 +1,11 @@
 const express = require('express');
-const shippingDetailsController = require('../controllers/shippingDetailsController');
-
 const router = express.Router();
+const shippingDetailController = require('../controllers/shippingDetailsController');
 
-router.get('/', shippingDetailsController.getAllShippingDetails);
-router.get('/:id', shippingDetailsController.getShippingDetailsById);
-router.post('/', shippingDetailsController.createShippingDetails);
-router.put('/:id', shippingDetailsController.updateShippingDetails);
-router.delete('/:id', shippingDetailsController.deleteShippingDetails);
+// ShippingDetail routes
+router.get('/:shippingDetailId?', shippingDetailController.getShippingDetails);
+router.post('/', shippingDetailController.createShippingDetail);
+router.put('/:shippingDetailId', shippingDetailController.updateShippingDetail);
+router.delete('/:shippingDetailId', shippingDetailController.deleteShippingDetail);
 
 module.exports = router;

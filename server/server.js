@@ -14,6 +14,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const shippingDetailRoutes = require('./routes/shippingDetailRoutes');
 const adminLogRoutes = require('./routes/adminLogRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/shipping-details', shippingDetailRoutes);
 app.use('/api/admin-logs', adminLogRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health Check
 app.get('/', (req, res) => {

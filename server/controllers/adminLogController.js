@@ -1,65 +1,90 @@
+// controllers/adminLogController.js
 const AdminLog = require('../models/AdminLog');
+const User = require('../models/User');
 
-exports.getAllAdminLogs = async (req, res) => {
+// Create a new admin log entry
+exports.createLog = async (req, res) => {
   try {
-    const adminLogs = await AdminLog.findAll();
-    res.json(adminLogs);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch admin logs' });
-  }
-};
-
-exports.getAdminLogById = async (req, res) => {
-  try {
-    const adminLog = await AdminLog.findByPk(req.params.id);
-    if (adminLog) {
-      res.json(adminLog);
-    } else {
-      res.status(404).json({ error: 'Admin log not found' });
+    const { adminId, action, details } = req.body;
+    
+    // Validate adminId exists
+    const admin = await User.findByPk(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
     }
+
+    const newLog = await AdminLog.create({ adminId, action, details });
+    res.status(201).json(newLog);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch admin log' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.createAdminLog = async (req, res) => {
+// Get all admin logs
+exports.getAllLogs = async (req, res) => {
   try {
-    const { adminId, action } = req.body;
-    const newAdminLog = await AdminLog.create({ adminId, action });
-    res.status(201).json(newAdminLog);
+    const logs = await AdminLog.findAll();
+    res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create admin log' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.updateAdminLog = async (req, res) => {
+// Get a single log by ID
+exports.getLogById = async (req, res) => {
   try {
-    const { adminId, action } = req.body;
-    const [updated] = await AdminLog.update({ adminId, action }, {
-      where: { id: req.params.id }
-    });
-    if (updated) {
-      const updatedAdminLog = await AdminLog.findByPk(req.params.id);
-      res.json(updatedAdminLog);
-    } else {
-      res.status(404).json({ error: 'Admin log not found' });
+    const { id } = req.params;
+    const log = await AdminLog.findByPk(id);
+    
+    if (!log) {
+      return res.status(404).json({ message: 'Log not found' });
     }
+    
+    res.status(200).json(log);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update admin log' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-exports.deleteAdminLog = async (req, res) => {
+// Update a log entry
+exports.updateLog = async (req, res) => {
   try {
-    const deleted = await AdminLog.destroy({
-      where: { id: req.params.id }
-    });
-    if (deleted) {
-      res.status(204).json({ message: 'Admin log deleted' });
-    } else {
-      res.status(404).json({ error: 'Admin log not found' });
+    const { id } = req.params;
+    const { action, details } = req.body;
+
+    const log = await AdminLog.findByPk(id);
+    if (!log) {
+      return res.status(404).json({ message: 'Log not found' });
     }
+
+    log.action = action || log.action;
+    log.details = details || log.details;
+    await log.save();
+
+    res.status(200).json(log);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete admin log' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete a log entry (soft delete)
+exports.deleteLog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const log = await AdminLog.findByPk(id);
+    
+    if (!log) {
+      return res.status(404).json({ message: 'Log not found' });
+    }
+
+    await log.destroy(); // Soft delete
+    res.status(200).json({ message: 'Log deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

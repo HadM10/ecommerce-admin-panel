@@ -1,65 +1,57 @@
-const Payment = require('../models/Payment');
+const { Payment } = require('../models/Payment');
 
-exports.getAllPayments = async (req, res) => {
+// Fetch all payments or a single payment by ID
+exports.getPayments = async (req, res) => {
   try {
-    const payments = await Payment.findAll();
-    res.json(payments);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch payments' });
-  }
-};
-
-exports.getPaymentById = async (req, res) => {
-  try {
-    const payment = await Payment.findByPk(req.params.id);
-    if (payment) {
-      res.json(payment);
+    const payments = req.params.paymentId
+      ? await Payment.findByPk(req.params.paymentId)
+      : await Payment.findAll();
+    if (payments) {
+      res.json(payments);
     } else {
-      res.status(404).json({ error: 'Payment not found' });
+      res.status(404).json({ message: 'No payments found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch payment' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
+// Create a new payment
 exports.createPayment = async (req, res) => {
   try {
-    const { order_id, payment_method, payment_status, transaction_id } = req.body;
-    const newPayment = await Payment.create({ order_id, payment_method, payment_status, transaction_id });
-    res.status(201).json(newPayment);
+    const payment = await Payment.create(req.body);
+    res.status(201).json(payment);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create payment' });
+    res.status(400).json({ message: 'Failed to create payment', error });
   }
 };
 
+// Update an existing payment
 exports.updatePayment = async (req, res) => {
   try {
-    const { order_id, payment_method, payment_status, transaction_id } = req.body;
-    const [updated] = await Payment.update({ order_id, payment_method, payment_status, transaction_id }, {
-      where: { id: req.params.id }
-    });
-    if (updated) {
-      const updatedPayment = await Payment.findByPk(req.params.id);
-      res.json(updatedPayment);
+    const payment = await Payment.findByPk(req.params.paymentId);
+    if (payment) {
+      await payment.update(req.body);
+      res.json(payment);
     } else {
-      res.status(404).json({ error: 'Payment not found' });
+      res.status(404).json({ message: 'Payment not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update payment' });
+    res.status(400).json({ message: 'Failed to update payment', error });
   }
 };
 
+// Delete a payment
 exports.deletePayment = async (req, res) => {
   try {
-    const deleted = await Payment.destroy({
-      where: { id: req.params.id }
-    });
-    if (deleted) {
-      res.status(204).json({ message: 'Payment deleted' });
+    const payment = await Payment.findByPk(req.params.paymentId);
+    if (payment) {
+      await payment.destroy();
+      res.json({ message: 'Payment deleted successfully' });
     } else {
-      res.status(404).json({ error: 'Payment not found' });
+      res.status(404).json({ message: 'Payment not found' });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete payment' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
