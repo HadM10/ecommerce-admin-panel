@@ -54,6 +54,18 @@ const AdminPanel = () => {
               </li>
               <li>
                 <Link
+                  to="/categories"
+                  className={`block px-4 py-2 rounded-lg text-lg transition duration-300 ${
+                    location.pathname === '/categories'
+                      ? 'bg-primary text-white'
+                      : 'text-text hover:bg-primary hover:text-white'
+                  }`}
+                >
+                  Categories
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/products"
                   className={`block px-4 py-2 rounded-lg text-lg transition duration-300 ${
                     location.pathname === '/products'

@@ -24,7 +24,7 @@ const Login = () => {
       const { token } = await login({ username, password });
       localStorage.setItem('token', token); // Store token in local storage
       setAuthToken(token); // Update AuthContext
-      navigate('/'); // Redirect to dashboard
+      navigate('/dashboard'); // Redirect to dashboard
     } catch (err) {
       // Log the entire error object for debugging
       console.error('Login error:', err);
