@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./db');
-const User = require('./User');
+const ClientUser = require('./ClientUser'); // Import ClientUser model
 
 const Order = sequelize.define('Order', {
   id: {
@@ -11,13 +11,14 @@ const Order = sequelize.define('Order', {
   userId: {
     type: DataTypes.INTEGER,
     references: {
-      model: User,
+      model: ClientUser, // Reference to ClientUser model
       key: 'id',
     },
   },
   status: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Archived'),
     allowNull: false,
+    defaultValue: 'Pending',
   },
   totalAmount: {
     type: DataTypes.FLOAT,
@@ -25,7 +26,7 @@ const Order = sequelize.define('Order', {
   },
   trackingNumber: {
     type: DataTypes.STRING,
-    allowNull: true, // Optional if you're not using tracking numbers
+    allowNull: true,
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -37,7 +38,8 @@ const Order = sequelize.define('Order', {
   },
 });
 
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
+// Define associations
+ClientUser.hasMany(Order, { foreignKey: 'userId' });
+Order.belongsTo(ClientUser, { foreignKey: 'userId' });
 
 module.exports = Order;

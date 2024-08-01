@@ -15,6 +15,7 @@ const shippingDetailRoutes = require('./routes/shippingDetailRoutes');
 const adminLogRoutes = require('./routes/adminLogRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const ClientUserRoutes = require('./routes/clientUserRoutes');
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/shipping-details', shippingDetailRoutes);
 app.use('/api/admin-logs', adminLogRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/client-users', ClientUserRoutes);
 
 // Health Check
 app.get('/', (req, res) => {

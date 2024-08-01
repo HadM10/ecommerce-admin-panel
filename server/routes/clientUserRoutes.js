@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { registerClientUser, loginClientUser } = require('../controllers/clientUserController');
+const clientUserController = require('../controllers/clientUserController');
+const authMiddleware = require('../middleware/auth'); // Assumes you have a middleware for authentication
 
-router.post('/register', registerClientUser);
-router.post('/login', loginClientUser);
+// POST register a new user
+router.post('/register', clientUserController.register);
 
-// Add other client user-related routes as needed
+// POST sign in a user
+router.post('/signin', clientUserController.signIn);
+
+// PUT update user information
+router.put('/update', authMiddleware, clientUserController.updateUser);
 
 module.exports = router;
