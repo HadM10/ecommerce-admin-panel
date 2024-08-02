@@ -28,7 +28,6 @@ exports.getDashboardSummary = async (req, res) => {
   }
 };
 
-// Get Most Sold Products
 exports.getMostSoldProducts = async (req, res) => {
   try {
     const mostSoldProducts = await OrderItem.findAll({
@@ -39,11 +38,22 @@ exports.getMostSoldProducts = async (req, res) => {
       group: ['productId'],
       order: [[sequelize.fn('SUM', sequelize.col('quantity')), 'DESC']],
       limit: 10,
-      include: [{ model: Product, attributes: ['name'] }],
+      include: [
+        {
+          model: Product,
+          attributes: ['name'],
+        },
+      ],
       raw: true,
     });
 
-    res.status(200).json(mostSoldProducts);
+    const result = mostSoldProducts.map((item) => ({
+      productId: item.productId,
+      productName: item['Product.name'],
+      totalQuantity: parseFloat(item.totalQuantity), // Ensure it's a number
+    }));
+
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -88,27 +98,56 @@ exports.getMostSoldCategories = async (req, res) => {
   }
 };
 
-// Get Sales Overview
 exports.getSalesOverview = async (req, res) => {
   try {
     const salesOverview = await OrderItem.findAll({
       attributes: [
-        [sequelize.fn('SUM', sequelize.col('price')), 'totalSales'],
-        [sequelize.fn('SUM', sequelize.col('quantity')), 'totalQuantity'],
+        [
+          sequelize.fn(
+            'DATE_FORMAT',
+            sequelize.col('OrderItem.createdAt'),
+            '%Y-%m'
+          ),
+          'month',
+        ],
+        [sequelize.fn('SUM', sequelize.col('OrderItem.price')), 'totalSales'],
       ],
       include: [
         {
           model: Order,
-          attributes: [],
-          where: { status: 'completed' },
+          attributes: [], // No need to select any attributes from Order
+          where: { status: 'Delivered' },
         },
+      ],
+      group: [
+        sequelize.fn(
+          'DATE_FORMAT',
+          sequelize.col('OrderItem.createdAt'),
+          '%Y-%m'
+        ),
+      ],
+      order: [
+        [
+          sequelize.fn(
+            'DATE_FORMAT',
+            sequelize.col('OrderItem.createdAt'),
+            '%Y-%m'
+          ),
+          'ASC',
+        ],
       ],
       raw: true,
     });
 
-    res.status(200).json(salesOverview[0]);
+    // Convert result to include numeric values for total sales
+    const result = salesOverview.map((item) => ({
+      month: item.month,
+      totalSales: parseFloat(item.totalSales), // Convert to number if needed
+    }));
+
+    res.status(200).json(result);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching sales overview:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
