@@ -81,46 +81,71 @@ const OrderPage = () => {
       {/* Search and Filter */}
       <div className="bg-white p-6 rounded-lg shadow-md border border-border mb-6">
         <h2 className="text-2xl font-semibold mb-4 text-text">Search and Filter</h2>
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mb-4">
+        <div className="flex flex-col gap-4 mb-4">
+          {/* Search Bar */}
           <input
             type="text"
             placeholder="Search by status, user name, or address"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-border p-2 rounded-lg w-full text-text placeholder:text-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
+            className="border border-border p-2 rounded-lg text-text placeholder:text-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 h-12"
           />
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
-          />
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
-          />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
-          >
-            <option value="">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-          </select>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="priceHighLow">Highest Price First</option>
-            <option value="priceLowHigh">Lowest Price First</option>
-          </select>
+
+          {/* Filters Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="dateFrom" className="text-sm font-medium text-text">
+                From Date
+              </label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 h-12"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="dateTo" className="text-sm font-medium text-text">
+                To Date
+              </label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 h-12"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="status" className="text-sm font-medium text-text">
+                Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 h-12"
+              >
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="sort" className="text-sm font-medium text-text">
+                Sort By
+              </label>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="border border-border p-2 rounded-lg text-text shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 h-12"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="priceHighLow">Highest Price First</option>
+                <option value="priceLowHigh">Lowest Price First</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 

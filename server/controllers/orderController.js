@@ -6,8 +6,9 @@ const Product = require('../models/Product');
 
 // Get all orders with associated order items and client user details
 const getAllOrders = async (req, res) => {
-  const { status, dateFrom, dateTo, search } = req.query;
+  const { status, dateFrom, dateTo, search, sort } = req.query;
   let whereClause = {};
+  let orderClause = [];
 
   // Filter by order status
   if (status) {
@@ -33,9 +34,28 @@ const getAllOrders = async (req, res) => {
     ];
   }
 
+  // Sorting logic
+  switch (sort) {
+    case 'newest':
+      orderClause = [['createdAt', 'DESC']];
+      break;
+    case 'oldest':
+      orderClause = [['createdAt', 'ASC']];
+      break;
+    case 'priceHighLow':
+      orderClause = [['totalAmount', 'DESC']];
+      break;
+    case 'priceLowHigh':
+      orderClause = [['totalAmount', 'ASC']];
+      break;
+    default:
+      orderClause = [['createdAt', 'DESC']]; // Default to newest first
+  }
+
   try {
     const orders = await Order.findAll({
       where: whereClause,
+      order: orderClause,
       include: [
         {
           model: OrderItem,

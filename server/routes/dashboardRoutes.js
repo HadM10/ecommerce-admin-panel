@@ -8,5 +8,6 @@ router.get('/most-sold-products', dashboardController.getMostSoldProducts);
 router.get('/most-sold-categories', dashboardController.getMostSoldCategories);
 router.get('/sales-overview', dashboardController.getSalesOverview);
 router.get('/recent-activity', dashboardController.getRecentActivity);
+router.get('/daily-sales-overview', dashboardController.getDailySalesOverview);
 
 module.exports = router;

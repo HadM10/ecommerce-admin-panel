@@ -152,6 +152,61 @@ exports.getSalesOverview = async (req, res) => {
   }
 };
 
+// Function to get daily sales overview
+exports.getDailySalesOverview = async (req, res) => {
+  try {
+    const dailySalesOverview = await OrderItem.findAll({
+      attributes: [
+        [
+          sequelize.fn(
+            'DATE_FORMAT',
+            sequelize.col('OrderItem.createdAt'),
+            '%Y-%m-%d'
+          ),
+          'date',
+        ],
+        [sequelize.fn('SUM', sequelize.col('OrderItem.price')), 'totalSales'],
+      ],
+      include: [
+        {
+          model: Order,
+          attributes: [], // No need to select any attributes from Order
+          where: { status: 'Delivered' },
+        },
+      ],
+      group: [
+        sequelize.fn(
+          'DATE_FORMAT',
+          sequelize.col('OrderItem.createdAt'),
+          '%Y-%m-%d'
+        ),
+      ],
+      order: [
+        [
+          sequelize.fn(
+            'DATE_FORMAT',
+            sequelize.col('OrderItem.createdAt'),
+            '%Y-%m-%d'
+          ),
+          'ASC',
+        ],
+      ],
+      raw: true,
+    });
+
+    // Convert result to include numeric values for total sales
+    const result = dailySalesOverview.map((item) => ({
+      date: item.date,
+      totalSales: parseFloat(item.totalSales), // Convert to number if needed
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching daily sales overview:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Get Recent Activity
 exports.getRecentActivity = async (req, res) => {
   try {

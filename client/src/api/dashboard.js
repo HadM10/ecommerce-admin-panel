@@ -14,6 +14,9 @@ const getMostSoldCategories = () => axios.get(`${API_URL}/most-sold-categories`)
 // Fetch sales overview
 const getSalesOverview = () => axios.get(`${API_URL}/sales-overview`);
 
+// Fetch daily sales overview
+const getDailySalesOverview = () => axios.get(`${API_URL}/daily-sales-overview`);
+
 // Fetch recent admin logs
 const getRecentActivity = () => axios.get(`${API_URL}/recent-activity`);
 
@@ -23,4 +26,5 @@ export {
   getMostSoldCategories,
   getSalesOverview,
   getRecentActivity,
+  getDailySalesOverview
 };
