@@ -34,7 +34,23 @@ const ClientUser = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    // Add any additional fields relevant to client users
+    status: {
+      type: DataTypes.ENUM('active', 'suspended'),
+      allowNull: false,
+      defaultValue: 'active',
+    },
+    lastLogin: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    totalOrders: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    totalSpent: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0.0,
+    },
   },
   {
     timestamps: true,

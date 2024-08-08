@@ -24,7 +24,7 @@ const AdminLog = sequelize.define(
       allowNull: false,
     },
     details: {
-      type: DataTypes.JSONB,
+      type: DataTypes.JSON,
       allowNull: true,
     },
     createdAt: {
