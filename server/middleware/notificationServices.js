@@ -1,43 +1,44 @@
 const AdminLog = require('../models/AdminLog');
 const User = require('../models/User');
+const notificationService = require('../middleware/'); // Import your notification service
 
 // Create a new admin log entry
-exports.createLog = async (
-  username,
-  action,
-  details = {},
-  isNotification = true
-) => {
+exports.createLog = async (req, res) => {
   try {
-    // Validate that the admin exists
-    const admin = await User.findOne({ where: { username } });
+    const { adminId, action, details, isNotification = true } = req.body;
+
+    // Validate that adminId exists
+    const admin = await User.findByPk(adminId);
     if (!admin) {
-      console.error('Admin not found');
-      throw new Error('Admin not found');
+      return res.status(404).json({ message: 'Admin not found' });
     }
 
     // Create the log entry
-    await AdminLog.create({
-      username,
+    const newLog = await AdminLog.create({
+      adminId,
       action,
-      details,
-      isNotification,
-      createdAt: new Date(), // Add timestamp
+      details: details || {}, // Default to an empty object if details are not provided
+      isNotification
     });
 
-    console.log('Log created successfully');
+    // Send notification if needed
+    if (isNotification) {
+      await notificationService.sendNotification(newLog);
+    }
+
+    res.status(201).json(newLog);
   } catch (error) {
     console.error('Error creating log:', error);
-    throw error;
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 // Get all admin logs with optional filtering and pagination
 exports.getAllLogs = async (req, res) => {
   try {
-    const { page = 1, limit = 10, username } = req.query;
+    const { page = 1, limit = 10, adminId } = req.query;
 
-    const whereClause = username ? { username } : {};
+    const whereClause = adminId ? { adminId } : {};
     const offset = (page - 1) * limit;
 
     const logs = await AdminLog.findAndCountAll({

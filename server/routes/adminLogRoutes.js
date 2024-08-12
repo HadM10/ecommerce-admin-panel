@@ -7,7 +7,7 @@ const adminLogController = require('../controllers/adminLogController');
 router.post('/', adminLogController.createLog); // Create a new log
 router.get('/', adminLogController.getAllLogs); // Get all logs
 router.get('/:id', adminLogController.getLogById); // Get a single log by ID
-router.put('/:id', adminLogController.updateLog); // Update a log entry
+router.put('/restore/:id', adminLogController.restoreLog); // Update a log entry
 router.delete('/:id', adminLogController.deleteLog); // Delete a log entry
 
 module.exports = router;

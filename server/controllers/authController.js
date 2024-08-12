@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const AdminLogController = require('./adminLogController'); // Import the AdminLogController
 require('dotenv').config();
 
 exports.register = async (req, res) => {
@@ -64,6 +65,13 @@ exports.register = async (req, res) => {
         if (err) throw err;
         res.status(201).json({ token });
       }
+    );
+    // Log the user registration
+    await AdminLogController.createLog(
+      username,
+      `${req.admin.username} registered ${username} as ${role}`,
+      { username, email, role },
+      true
     );
   } catch (err) {
     console.error('Registration error:', err);
@@ -154,7 +162,6 @@ exports.getAdmins = async (req, res) => {
   }
 };
 
-// Login function
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -189,11 +196,23 @@ exports.login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    console.log('Generated Token:', token); // Debugging line
-
+    // Send the token in the response
     res.json({ token });
+
+    // Log the login action
+    try {
+      // Assuming `createLog` does not send a response
+      await AdminLogController.createLog(
+        user.username,
+        `${user.username} logged in`,
+        { username: user.username },
+        true
+      );
+    } catch (logError) {
+      console.error('Error logging action:', logError);
+    }
   } catch (err) {
-    console.error(err);
+    console.error('Login Error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

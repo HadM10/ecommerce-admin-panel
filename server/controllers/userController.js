@@ -1,10 +1,12 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const AdminLogController = require('./adminLogController'); // Import the AdminLogController
 
 // Register a new user
 exports.registerUser = async (req, res) => {
   const { username, email, password, role } = req.body;
+  const adminId = req.admin.id; // Assuming you have a way to get the adminId
 
   try {
     const user = await User.findOne({ where: { email } });
@@ -34,6 +36,14 @@ exports.registerUser = async (req, res) => {
         res.status(201).json({ token });
       }
     );
+
+    // Log the user registration
+    await AdminLogController.createLog(
+      adminId,
+      `${req.admin.username} registered ${username} as ${role}`,
+      { username, email, role },
+      true
+    );
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -41,7 +51,8 @@ exports.registerUser = async (req, res) => {
 
 // Login user
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
+  const adminId = req.admin.id; // Assuming you have a way to get the adminId
 
   try {
     const user = await User.findOne({ where: { email } });
@@ -66,6 +77,14 @@ exports.loginUser = async (req, res) => {
         if (err) throw err;
         res.json({ token });
       }
+    );
+
+    // Log the login action
+    await AdminLogController.createLog(
+      adminId,
+      `${req.admin.username} logged in`,
+      { username },
+      true
     );
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -99,6 +118,7 @@ exports.getUserById = async (req, res) => {
 // Update user
 exports.updateUser = async (req, res) => {
   const { username, email, password, role } = req.body;
+  const adminId = req.admin.id; // Assuming you have a way to get the adminId
 
   try {
     const user = await User.findByPk(req.params.id);
@@ -117,6 +137,15 @@ exports.updateUser = async (req, res) => {
     user.role = role;
 
     await user.save();
+
+    // Log the user update
+    await AdminLogController.createLog(
+      adminId,
+      `${req.admin.username} updated ${username}`,
+      { username, email, role },
+      true
+    );
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update user' });
@@ -125,11 +154,21 @@ exports.updateUser = async (req, res) => {
 
 // Delete user
 exports.deleteUser = async (req, res) => {
+  const adminId = req.admin.id; // Assuming you have a way to get the adminId
+
   try {
     const deleted = await User.destroy({
       where: { id: req.params.id },
     });
+
     if (deleted) {
+      // Log the user deletion
+      await AdminLogController.createLog(
+        adminId,
+        `${req.admin.username} deleted user with ID ${req.params.id}`,
+        { userId: req.params.id },
+        true
+      );
       res.status(204).json({ message: 'User deleted' });
     } else {
       res.status(404).json({ error: 'User not found' });
