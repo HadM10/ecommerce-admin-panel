@@ -66,13 +66,18 @@ exports.register = async (req, res) => {
         res.status(201).json({ token });
       }
     );
-    // Log the user registration
-    await AdminLogController.createLog(
-      username,
-      `${req.admin.username} registered ${username} as ${role}`,
-      { username, email, role },
-      true
-    );
+    // Log the register action
+    try {
+      // Assuming `createLog` does not send a response
+      await AdminLogController.createLog(
+        username,
+        `${req.admin.username} registered as ${role}`,
+        { username: username },
+        true
+      );
+    } catch (logError) {
+      console.error('Error logging action:', logError);
+    }
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: err.message });

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { createProduct } from '../api/product';
 import { getAllCategories } from '../api/categories'; // Import the getAllCategories function
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const AddProduct = () => {
+  const { auth } = useContext(AuthContext); // Access AuthContext
   const [productData, setProductData] = useState({
     name: '',
     description: '',
@@ -41,7 +43,7 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createProduct(productData);
+      await createProduct(auth.token, productData);
       navigate('/products'); // Navigate to the products page
     } catch (error) {
       setError(error.message || 'Failed to create product');

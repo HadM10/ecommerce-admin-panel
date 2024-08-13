@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getAllProducts, deleteProduct } from '../api/product';
 import { getAllCategories } from '../api/categories';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const ProductsPage = () => {
+  const { auth } = useContext(AuthContext); // Access AuthContext
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
@@ -16,7 +18,7 @@ const ProductsPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await getAllProducts();
+        const data = await getAllProducts(auth.token);
         setProducts(data);
       } catch (error) {
         setError('Failed to fetch products');
@@ -41,7 +43,7 @@ const ProductsPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteProduct(id);
+        await deleteProduct(auth.token, id);
         setProducts(products.filter((product) => product.id !== id));
         alert('Product deleted successfully');
       } catch (error) {
@@ -200,7 +202,7 @@ const ProductsPage = () => {
                 <td className="p-2 border-b border-border text-center">
                   <div className="flex justify-center space-x-2">
                     <Link
-                      to={`/edit/${product.id}`}
+                      to={`edit/${product.id}`}
                       className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                     >
                       Edit

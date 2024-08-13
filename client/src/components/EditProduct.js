@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getProductById, updateProduct } from '../api/product';
 import { getAllCategories } from '../api/categories';
 import { useParams, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const EditProduct = () => {
+  const { auth } = useContext(AuthContext); // Access AuthContext
   const [productData, setProductData] = useState({
     name: '',
     description: '',
@@ -22,7 +24,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const data = await getProductById(id);
+        const data = await getProductById(auth.token, id);
         setProductData(data);
       } catch (error) {
         setError(error.message || 'Failed to fetch product');
@@ -53,7 +55,7 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateProduct(id, productData);
+      await updateProduct(auth.token, id, productData);
       navigate('/products');
     } catch (error) {
       setError(error.message || 'Failed to update product');

@@ -35,7 +35,7 @@ const AppRoutes = () => (
       <Route path="products" element={<Products />} />
       <Route path="products/add" element={<AddProduct />} />
       <Route path="products/edit/:id" element={<EditProduct />} />
-      <Route path="customer-service" element={<CustomerService />} />
+      {/* <Route path="customer-service" element={<CustomerService />} /> */}
       <Route path="settings" element={<Settings />} />
       <Route path="approve" element={<ApproveAdmin />} />
     </Route>
