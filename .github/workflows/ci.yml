@@ -29,4 +29,3 @@ jobs:
         run: |
           cd server
           npm install
-          npm test # Replace with your backend test command
