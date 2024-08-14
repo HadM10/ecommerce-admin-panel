@@ -45,7 +45,7 @@ const EditProduct = () => {
 
     fetchProduct();
     fetchCategories();
-  }, [id]);
+  }, [auth.token, id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
